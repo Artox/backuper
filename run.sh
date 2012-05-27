@@ -80,7 +80,7 @@ backup_databases(){
 	done
 }
 
-# will loop through all files lsited to be backed up
+# will loop through all files listed to be backed up
 # params: <filecount> <backuppath>
 backup_files(){
 	# retrieve parameters
@@ -94,7 +94,7 @@ backup_files(){
 		eval file=\$file_$i
 
 		# append current timestamp to filename
-		filename=`basename $file`
+		filename=`basename "$file"`
 		timestamp=`date +"%g-%m-%d %H:%M:%S"`
 		filename="$filename $timestamp"
 
@@ -108,6 +108,38 @@ backup_files(){
 	done
 }
 
+# will loop through all folders listed to be backed up
+# params <foldercount> <backuppath>
+backup_folders(){
+	# retrieve parameters
+	count=$1
+	backupdir=$2
+
+	# act on each folder
+	for i in `seq 1 $count`
+	do
+		# get name of folder i
+		eval folder=\$folder_$i
+
+		# make tar archive from folder
+		foldername=`basename "$folder"`
+		tar cf "$foldername.tar" "$folder"
+
+		# append current timestamp to backup file
+		timestamp=`date +"%g-%m-%d %H:%M:%S"`
+		filename="$foldername $timestamp"
+		mv "$foldername.tar" "$filename.tar"
+
+		# compress the tar
+		compress_file backup "$filename.tar"
+
+		# back it up now
+		backup_file "$backup" "$backupdir" false
+
+		# done
+		echo "Created $backup"
+	done
+}
 
 # here the main work is done
 # load configuration
@@ -118,3 +150,6 @@ backup_databases $database_count "$backupdir"
 
 # backup files
 backup_files $file_count "$backupdir"
+
+# backup folders
+backup_folders $folder_count "$backupdir"

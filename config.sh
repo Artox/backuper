@@ -21,4 +21,9 @@ database_1_pass=mypass
 # which files to back up
 #
 file_count=1
-file_1=<yourfile>
+file_1=yourfile
+
+# which folders to back up
+#
+folder_count=1
+folder_1=yourfolder
